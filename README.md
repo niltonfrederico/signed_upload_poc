@@ -2,7 +2,11 @@
 
 This POC covers AWS Signed Upload and its features.
 
-To run just use:
+To get it started run:
+
+`cp .env.example .env`
+
+Add your credentials, and then run:
 
 `make up`
 
