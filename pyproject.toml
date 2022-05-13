@@ -8,6 +8,8 @@ authors = ["Nilton Frederico Teixeira <9078708+niltonfrederico@users.noreply.git
 python = "^3.10"
 boto3 = "^1.22.13"
 fastapi = "^0.77.1"
+environs = "^9.5.0"
+uvicorn = "^0.17.6"
 
 [tool.poetry.dev-dependencies]
 black = "^22.3.0"
