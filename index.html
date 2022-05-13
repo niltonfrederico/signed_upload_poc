@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <section>
+        <h1>Formulário de upload</h1>
+        <form id="upload" method="post">
+            <input type="file" id="upload-file" name="arquivo" />
+            <input type="submit">
+        </form>
+    </section>
+    <section>
+        <h1>Resultados:</h1>
+        <main>
+            <b>Url assinada: </b> <span id="signed-url"></span> <br>
+            <b>Retorno upload: </b> <span id="response"></span> <br>
+        </main>
+    </section>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    // Deve primeiro bater e pegar a url assinada
+    var formEl = document.getElementById("upload");
+    var signedUrl = document.getElementById("signed-url");
+    var responseEl = document.getElementById("response");
+
+    formEl.addEventListener("submit", function (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+
+        filename = uuidv4()
+
+        axios.post("http://localhost:3000/generate-signed-url", { "object_name": filename }).then(function (response) {
+            signedUrl.innerText = response.data.upload_url.url
+
+            console.info(response.data);
+
+            var formData = new FormData();
+            var imagefile = document.querySelector('#upload-file');
+            formData.append("AWSAccessKeyId", response.data.upload_url.fields.AWSAccessKeyId);
+            formData.append("key", response.data.upload_url.fields.key);
+            formData.append("policy", response.data.upload_url.fields.policy);
+            formData.append("signature", response.data.upload_url.fields.signature);
+            formData.append("file", imagefile.files[0]);
+
+            axios.post(response.data.upload_url.url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(function (response) {
+                console.log(response);
+                responseEl.innerText = "Sucess"
+            }).catch(function (error) {
+                console.log(error);
+                responseEl.innerText = "Error"
+            });
+        });
+    });
+
+// Deve-se fazer o upload para a url assinada
+</script>
+
+</html>
